@@ -4,18 +4,13 @@ import EventList from "../../components/events/event-list";
 import ResultsTitle from "../../components/events/results-title";
 import Button from "../../components/ui/button";
 import ErrorAlert from "../../components/ui/error-alert";
-import { getFilteredEvents } from "../../dummy-data";
+import { getFilteredEvents } from "../../helpers/api-util";
 
-export default function FilteredEvents() {
+export async function getServerSideProps(context: any) {
+    const { params } = context;
 
-    const router = useRouter();
-
-    const filterData = router.query.slug;
-
-    if (!filterData) {
-        return (<p className="center">Loading...</p>);
-    }
-
+    const filterData = params.slug;
+    
     const filteredYear = filterData[0];
     const filteredMonth = filterData[1];
 
@@ -23,6 +18,35 @@ export default function FilteredEvents() {
     const numMonth = +filteredMonth;
 
     if (isNaN(numYear) || isNaN(numMonth) || numYear > 2030 || numYear < 2021 || numMonth < 1 || numMonth > 12) {
+        return {
+            props: { hasError: true }
+            // redirect: {destination: "/error"}
+            // notFound: true 
+        };
+    }
+
+    const filteredEvent = await getFilteredEvents({
+        year: numYear,
+        month: numMonth
+    });
+
+    return {
+        props: {
+            events: filteredEvent,
+            date: {
+                year: numYear,
+                month: numMonth
+            }
+        }
+    };
+
+}
+
+export default function FilteredEvents(props: any) {
+
+    const router = useRouter();
+
+    if (props.hasError) {
         return (<Fragment>
             <ErrorAlert>
                 <p>Invalid filter, Please adjust your value</p>
@@ -33,10 +57,7 @@ export default function FilteredEvents() {
         </Fragment>);
     }
 
-    const filteredEvent = getFilteredEvents({
-        year: numYear,
-        month: numMonth
-    });
+    const filteredEvent = props.events;
 
     if (!filteredEvent || filteredEvent.length === 0) {
         return (<Fragment>
@@ -49,7 +70,7 @@ export default function FilteredEvents() {
         </Fragment>);
     }
 
-    const date = new Date(numYear, numMonth - 1);
+    const date = new Date(props.date.year, props.date.month - 1);
 
     return (
         <Fragment>

@@ -2,11 +2,23 @@ import { Fragment } from "react";
 import { useRouter } from "next/router";
 import EventList from "../../components/events/event-list";
 import EventsSearch from "../../components/events/events-search";
-import { getAllEvents } from "../../dummy-data"
+import { getAllEvents } from "../../helpers/api-util"
 
-export default function AllEvents() {
+export async function getStaticProps() {
+    const events = await getAllEvents();
 
-    const events = getAllEvents();
+    return {
+        props: {
+            events: events
+        },
+        // add for regenerating new incoming requests - 10s
+        revalidate: 10
+    }
+}
+
+export default function AllEvents(props: any) {
+
+    const { events } = props;
 
     const router = useRouter();
 
