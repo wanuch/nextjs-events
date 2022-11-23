@@ -1,5 +1,6 @@
 import { getFeaturedEvents } from "../helpers/api-util"
 import EventList from "../components/events/event-list";
+import Head from "next/head";
 
 export async function getStaticProps() {
   const featuredEvents = await getFeaturedEvents();
@@ -16,6 +17,10 @@ export async function getStaticProps() {
 export default function Home(props: any) {
   return (
     <div>
+      <Head>
+        <title>NextJS Events</title>
+        <meta name="description" content="Find a lot of great event that allow you to evoleve..."></meta>
+      </Head>
       <EventList items={props.events} />
     </div>
   )
