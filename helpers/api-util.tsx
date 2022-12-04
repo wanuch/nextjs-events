@@ -1,5 +1,5 @@
 export async function getAllEvents() {
-    const response = await fetch("https://react-getting-start-62baa-default-rtdb.asia-southeast1.firebasedatabase.app/events.json")
+    const response = await fetch("https://react-getting-start-5074d-default-rtdb.asia-southeast1.firebasedatabase.app/events.json")
     const data = await response.json();
     const events = [];
 
